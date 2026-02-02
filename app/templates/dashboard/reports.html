@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">System Reports</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <button class="btn btn-sm btn-outline-secondary dropdown-toggle">
+            <i class="fas fa-calendar"></i> This Week
+        </button>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card shadow border-left-primary py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Predictions (Today)</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ daily_predictions }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card shadow border-left-success py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Registered Patients</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_patients }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card shadow border-left-danger py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Total High Risk Cases
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_high_risk }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Model Usage Chart -->
+    <div class="col-lg-5 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Model Usage (LR vs RF)</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="modelUsageChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-7 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Recent High Risk Detections</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Patient Name</th>
+                                <th>Confidence</th>
+                                <th>Model Used</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pred in high_risk_predictions %}
+                            <tr>
+                                <td>{{ pred.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>{{ pred.patient.full_name }} (ID: {{ pred.patient_id }})</td>
+                                <td>{{ "%.1f"|format(pred.probability_score * 100) }}%</td>
+                                <td>{{ pred.model_used }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted">No high risk cases recently.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <hr>
+                <button class="btn btn-outline-primary btn-sm" onclick="window.print()"><i class="fas fa-print"></i>
+                    Print</button>
+                <a href="{{ url_for('main.compare_models') }}" class="btn btn-outline-info btn-sm"><i
+                        class="fas fa-chart-bar"></i> Compare Models</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    var ctxMenu = document.getElementById('modelUsageChart').getContext('2d');
+    var myPieChart = new Chart(ctxMenu, {
+        type: 'doughnut',
+        data: {
+            labels: {{ models | tojson }},
+    datasets: [{
+        data: {{ usage_counts | tojson }},
+        backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc'],
+        hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf'],
+        hoverBorderColor: "rgba(234, 236, 244, 1)",
+            }],
+        },
+    options: {
+        maintainAspectRatio: false,
+            tooltips: {
+            backgroundColor: "rgb(255,255,255)",
+                bodyFontColor: "#858796",
+                    borderColor: '#dddfeb',
+                        borderWidth: 1,
+                            xPadding: 15,
+                                yPadding: 15,
+                                    displayColors: false,
+                                        caretPadding: 10,
+            },
+        legend: {
+            display: true,
+                position: 'bottom'
+        },
+    },
+    });
+</script>
+{% endblock %}

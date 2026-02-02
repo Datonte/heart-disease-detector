@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-lg border-0 text-center p-5">
+            <div class="mb-4">
+                {% if comparison %}
+                <h2 class="text-primary font-weight-bold mb-4">Dual Model Analysis</h2>
+                <div class="row">
+                    {% for item in comparison %}
+                    <div class="col-md-6 mb-3">
+                        <div class="card shadow h-100 border-0">
+                            <div class="card-body text-center">
+                                <h5 class="text-uppercase text-muted mb-3">{{ item.model }}</h5>
+                                {% if item.result == 'Heart Disease Detected' or item.result == 'Heart Disease Present'
+                                %}
+                                <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
+                                <h4 class="text-danger font-weight-bold">High Risk</h4>
+                                <div class="progress mt-3" style="height: 20px;">
+                                    <div class="progress-bar bg-danger" role="progressbar"
+                                        style="width: {{ item.probability * 100 }}%">
+                                        {{ "%.1f"|format(item.probability * 100) }}%
+                                    </div>
+                                </div>
+                                {% else %}
+                                <i class="fas fa-heart fa-3x text-success mb-3"></i>
+                                <h4 class="text-success font-weight-bold">Low Risk</h4>
+                                <div class="progress mt-3" style="height: 20px;">
+                                    <div class="progress-bar bg-success" role="progressbar"
+                                        style="width: {{ item.probability * 100 }}%">
+                                        {{ "%.1f"|format(item.probability * 100) }}%
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {% if result == 'Heart Disease Detected' or result == 'Heart Disease Present' %}
+                <i
+                    class="fas fa-exclamation-triangle fa-5x text-danger animate__animated animate__pulse animate__infinite"></i>
+                <h1 class="mt-4 text-danger font-weight-bold">High Risk Detected</h1>
+                {% else %}
+                <i class="fas fa-heart fa-5x text-success animate__animated animate__bounce"></i>
+                <h1 class="mt-4 text-success font-weight-bold">Low Risk / Healthy</h1>
+                {% endif %}
+            </div>
+
+            <h3 class="mb-3">Prediction: {{ result }}</h3>
+            <h5 class="text-muted">Model Used: {{ model }}</h5>
+            <div class="progress mb-3" style="height: 25px;">
+                <div class="progress-bar {% if result == 'Heart Disease Detected' or result == 'Heart Disease Present' %}bg-danger{% else %}bg-success{% endif %}"
+                    role="progressbar" style="width: {{ probability * 100 }}%">
+                    {{ "%.1f"|format(probability * 100) }}% Confidence
+                </div>
+            </div>
+            {% endif %}
+
+            <p class="text-muted">Based on clinical parameters provided.</p>
+
+            <div class="mt-4">
+                <a href="{{ url_for('main.patients') }}" class="btn btn-primary me-2"><i class="fas fa-user"></i> View
+                    Patient Profile</a>
+                <a href="{{ url_for('main.predict') }}" class="btn btn-outline-secondary"><i class="fas fa-redo"></i>
+                    New Prediction</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

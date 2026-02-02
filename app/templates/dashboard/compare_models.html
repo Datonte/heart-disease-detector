@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Model Comparison</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{{ url_for('main.reports') }}" class="btn btn-sm btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Reports
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Usage Chart -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Model Usage (Total Predictions)</h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-bar">
+                    <canvas id="usageChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Positive Rate Chart -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-danger">Startling Detections (High Risk Count)</h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-bar">
+                    <canvas id="positiveChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-12">
+        <h4 class="mb-3 border-bottom pb-2">Training Evaluation Metrics (Last Training Run)</h4>
+    </div>
+
+    <!-- Training Metrics Chart -->
+    <div class="col-lg-8 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-info">Model Performance Comparison</h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-bar">
+                    <canvas id="trainingChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Training Metrics Table -->
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-secondary">Metric Values</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm">
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Logistic Regression</th>
+                                <th>Random Forest</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for metric in ['Accuracy', 'Precision', 'Recall', 'F1 Score'] %}
+                            <tr>
+                                <td>{{ metric }}</td>
+                                <td>{{ "%.2f"|format(training_metrics['Logistic Regression'][metric]) }}</td>
+                                <td>{{ "%.2f"|format(training_metrics['Random Forest'][metric]) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <h5>Detailed Live Usage Metrics</h5>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Model Name</th>
+                        <th>Total Used</th>
+                        <th>High Risk Findings</th>
+                        <th>% High Risk</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in range(labels|length) %}
+                    <tr>
+                        <td>{{ labels[i] }}</td>
+                        <td>{{ usage_data[i] }}</td>
+                        <td>{{ positive_data[i] }}</td>
+                        <td>
+                            {% if usage_data[i] > 0 %}
+                            {{ "%.1f"|format((positive_data[i] / usage_data[i]) * 100) }}%
+                            {% else %}
+                            0%
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js Script -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    var labels = {{ labels | tojson }};
+    var usageData = {{ usage_data | tojson }};
+    var positiveData = {{ positive_data | tojson }};
+
+    // Training Data
+    var trainingMetrics = {{ training_metrics | tojson }};
+    var metricsLabels = ['Accuracy', 'Precision', 'Recall', 'F1 Score'];
+    var lrData = metricsLabels.map(m => trainingMetrics['Logistic Regression'][m]);
+    var rfData = metricsLabels.map(m => trainingMetrics['Random Forest'][m]);
+
+    // Usage Chart
+    var ctxUsage = document.getElementById("usageChart").getContext('2d');
+    var usageChart = new Chart(ctxUsage, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: "Total Predictions",
+                backgroundColor: "#4e73df",
+                hoverBackgroundColor: "#2e59d9",
+                borderColor: "#4e73df",
+                data: usageData,
+            }],
+        },
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { precision: 0 }
+                }
+            }
+        }
+    });
+
+    // Positive Chart
+    var ctxPos = document.getElementById("positiveChart").getContext('2d');
+    var positiveChart = new Chart(ctxPos, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: "High Risk Detected",
+                backgroundColor: "#e74a3b",
+                hoverBackgroundColor: "#c0392b",
+                borderColor: "#e74a3b",
+                data: positiveData,
+            }],
+        },
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { precision: 0 }
+                }
+            }
+        }
+    });
+
+    // Training Comparison Chart
+    var ctxTraining = document.getElementById("trainingChart").getContext('2d');
+    var trainingChart = new Chart(ctxTraining, {
+        type: 'bar',
+        data: {
+            labels: metricsLabels,
+            datasets: [
+                {
+                    label: "Logistic Regression",
+                    backgroundColor: "#36b9cc",
+                    data: lrData
+                },
+                {
+                    label: "Random Forest",
+                    backgroundColor: "#1cc88a",
+                    data: rfData
+                }
+            ]
+        },
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 1.0
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

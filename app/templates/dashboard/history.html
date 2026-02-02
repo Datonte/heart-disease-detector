@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Prediction History</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{{ url_for('main.history', export='csv', **request.args) }}"
+            class="btn btn-sm btn-outline-secondary me-2">
+            <i class="fas fa-file-csv"></i> Export CSV
+        </a>
+        <a href="{{ url_for('main.history', export='pdf', **request.args) }}" class="btn btn-sm btn-outline-danger">
+            <i class="fas fa-file-pdf"></i> Export PDF
+        </a>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Filter Predictions</h6>
+    </div>
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('main.history') }}" class="row g-3">
+            <div class="col-md-3">
+                <label for="patient_name" class="form-label">Patient Name</label>
+                <input type="text" class="form-control" id="patient_name" name="patient_name"
+                    value="{{ request.args.get('patient_name', '') }}" placeholder="Search name...">
+            </div>
+            <div class="col-md-3">
+                <label for="risk_status" class="form-label">Risk Status</label>
+                <select class="form-select" id="risk_status" name="risk_status">
+                    <option value="">All Statuses</option>
+                    <option value="Heart Disease Detected" {% if
+                        request.args.get('risk_status')=='Heart Disease Detected' %}selected{% endif %}>Heart Disease
+                        Detected</option>
+                    <option value="No Heart Disease" {% if request.args.get('risk_status')=='No Heart Disease'
+                        %}selected{% endif %}>No Heart Disease</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="model_used" class="form-label">Model Used</label>
+                <select class="form-select" id="model_used" name="model_used">
+                    <option value="">All Models</option>
+                    <option value="Logistic Regression" {% if request.args.get('model_used')=='Logistic Regression'
+                        %}selected{% endif %}>Logistic Regression</option>
+                    <option value="Random Forest" {% if request.args.get('model_used')=='Random Forest' %}selected{%
+                        endif %}>Random Forest</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="date_filter" class="form-label">Date (From)</label>
+                <input type="date" class="form-control" id="date_filter" name="date_filter"
+                    value="{{ request.args.get('date_filter', '') }}">
+            </div>
+            <div class="col-12 text-end">
+                <a href="{{ url_for('main.history') }}" class="btn btn-secondary me-2">Reset Filters</a>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-filter"></i> Apply Filters</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Results Table -->
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Patient</th>
+                        <th>Result</th>
+                        <th>Probability</th>
+                        <th>Model Used</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pred in predictions %}
+                    <tr>
+                        <td>{{ pred.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>
+                            {% if pred.patient %}
+                            <a href="{{ url_for('main.patient_details', patient_id=pred.patient_id) }}">{{
+                                pred.patient.full_name }}</a>
+                            {% else %}
+                            <span class="text-danger">Deleted Patient ({{ pred.patient_id }})</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if pred.prediction_result == 'Heart Disease Detected' %}
+                            <span class="badge bg-danger">Detected</span>
+                            {% else %}
+                            <span class="badge bg-success">Normal</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ "%.2f"|format(pred.probability_score * 100) }}%</td>
+                        <td>{{ pred.model_used }}</td>
+                        <td>
+                            <!-- Just link to details for now, or maybe export single? -->
+                            <span class="text-muted"><small>ID: {{ pred.id }}</small></span>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">No predictions found matching your filters.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

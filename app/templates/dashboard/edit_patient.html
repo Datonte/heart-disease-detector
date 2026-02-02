@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Edit Patient Details</h1>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Update Information for {{ patient.full_name }}</h6>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                <div class="mb-3">
+                    <label for="full_name" class="form-label">Full Name</label>
+                    <input type="text" class="form-control" name="full_name" value="{{ patient.full_name }}" required>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="gender" class="form-label">Gender</label>
+                        <select class="form-select" name="gender" required>
+                            <option value="Male" {% if patient.gender=='Male' %}selected{% endif %}>Male</option>
+                            <option value="Female" {% if patient.gender=='Female' %}selected{% endif %}>Female</option>
+                            <option value="Other" {% if patient.gender=='Other' %}selected{% endif %}>Other</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="dob" class="form-label">Date of Birth</label>
+                        <input type="date" class="form-control" name="dob" value="{{ patient.dob }}" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="phone" class="form-label">Phone Number</label>
+                    <input type="tel" class="form-control" name="phone" value="{{ patient.phone }}">
+                </div>
+                <div class="mb-3">
+                    <label for="medical_history" class="form-label">Medical History (Brief)</label>
+                    <textarea class="form-control" name="medical_history"
+                        rows="3">{{ patient.medical_history }}</textarea>
+                </div>
+
+                <hr>
+                <div class="d-flex justify-content-end">
+                    <a href="{{ url_for('main.patients') }}" class="btn btn-secondary me-2">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Update Patient</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

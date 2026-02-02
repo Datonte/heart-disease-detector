@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Patient Info -->
+        <div class="col-md-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Patient Profile</h6>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <div class="rounded-circle bg-light d-inline-flex justify-content-center align-items-center"
+                            style="width: 100px; height: 100px;">
+                            <i class="fas fa-user fa-3x text-secondary"></i>
+                        </div>
+                        <h5 class="mt-2">{{ patient.full_name }}</h5>
+                        <p class="text-muted">ID: {{ patient.id }}</p>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Gender:</span> <strong>{{ patient.gender }}</strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>DOB:</span> <strong>{{ patient.dob.strftime('%Y-%m-%d') if patient.dob else 'N/A'
+                                }}</strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Phone:</span> <strong>{{ patient.phone }}</strong>
+                        </li>
+                        <li class="list-group-item">
+                            <span>Medical History:</span>
+                            <p class="small text-muted mt-1">{{ patient.medical_history }}</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prediction History -->
+        <div class="col-md-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Prediction History</h6>
+                    <div>
+                        <a href="{{ url_for('main.export_patient_predictions', patient_id=patient.id) }}"
+                            class="btn btn-sm btn-outline-success shadow-sm me-2"><i class="fas fa-download fa-sm"></i>
+                            Export CSV</a>
+                        <a href="{{ url_for('main.predict', patient_id=patient.id) }}"
+                            class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-plus fa-sm text-white-50"></i> New
+                            Prediction</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Result</th>
+                                    <th>Confidence</th>
+                                    <th>Model</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pred in predictions %}
+                                <tr>
+                                    <td>{{ pred.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    <td>
+                                        {% if pred.prediction_result == 'Heart Disease Detected' %}
+                                        <span class="badge bg-danger">Detected</span>
+                                        {% else %}
+                                        <span class="badge bg-success">Not Detected</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ "%.1f"|format(pred.probability_score * 100) }}%</td>
+                                    <td>{{ pred.model_used }}</td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="4" class="text-center">No predictions found for this patient.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

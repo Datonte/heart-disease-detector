@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="mt-4 mb-4">Dashboard Overview</h1>
+
+    <div class="row">
+        <!-- Stats Cards -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Patients</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_patients }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-injured fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Predictions Made
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_predictions }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Staff Members</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.staff_count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-md fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">High Risk Cases
+                                (Detected)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.high_risk_count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-heart-broken fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row">
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">High Risk vs Low Risk Overview</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-area">
+                        <canvas id="riskChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Latest Activity</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        {% for pred in stats.recent_predictions %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            {{ pred.patient.full_name }}
+                            {% if pred.prediction_result == 'Heart Disease Detected' %}
+                            <span class="badge bg-danger rounded-pill">High Risk</span>
+                            {% else %}
+                            <span class="badge bg-success rounded-pill">Safe</span>
+                            {% endif %}
+                        </li>
+                        {% else %}
+                        <li class="list-group-item text-center text-muted">No recent predictions.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js Script -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Simple pie chart logic
+    const ctx = document.getElementById('riskChart').getContext('2d');
+    const riskChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['High Risk', 'Low Risk'],
+            datasets: [{
+                data: [{{ stats.high_risk_count }}, {{ stats.total_predictions - stats.high_risk_count }}],
+        backgroundColor: ['#e74a3b', '#1cc88a'],
+        hoverBackgroundColor: ['#d63031', '#17a673'],
+        hoverBorderColor: "rgba(234, 236, 244, 1)",
+    }],
+        },
+    options: {
+        maintainAspectRatio: false,
+            tooltips: {
+            backgroundColor: "rgb(255,255,255)",
+                bodyFontColor: "#858796",
+                    borderColor: '#dddfeb',
+                        borderWidth: 1,
+                            xPadding: 15,
+                                yPadding: 15,
+                                    displayColors: false,
+                                        caretPadding: 10,
+            },
+        legend: {
+            display: true,
+                position: 'bottom'
+        },
+    },
+    });
+</script>
+{% endblock %}

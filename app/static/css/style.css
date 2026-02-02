@@ -1,0 +1,285 @@
+:root {
+    /* HeartFelt Brand Colors - Red/Rose Theme */
+    --primary-color: #e53935;
+    --primary-gradient: linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%);
+    --secondary-gradient: linear-gradient(135deg, #2b5876 0%, #4e4376 100%);
+
+    /* Bootstrap Overrides */
+    --bs-primary: #e53935;
+    --bs-primary-rgb: 229, 57, 53;
+    --bs-link-color: #e53935;
+    --bs-link-hover-color: #c62828;
+
+    /* Backgrounds */
+    --bg-color: #f8fafc;
+    --text-color: #1e293b;
+    --text-muted: #64748b;
+    --card-bg: #ffffff;
+    --sidebar-bg: #ffffff;
+    --nav-bg: rgba(255, 255, 255, 0.9);
+
+    /* Borders & Shadows */
+    --border-color: rgba(0, 0, 0, 0.05);
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] {
+    --primary-color: #ff5252;
+    --primary-gradient: linear-gradient(135deg, #ff4b2b 0%, #ff416c 100%);
+
+    /* Dark Backgrounds */
+    --bg-color: #0f172a;
+    --text-color: #f1f5f9;
+    --text-muted: #94a3b8;
+    --card-bg: #1e293b;
+    --sidebar-bg: #1e293b;
+    --nav-bg: rgba(30, 41, 59, 0.9);
+
+    --border-color: rgba(255, 255, 255, 0.1);
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Global Styles */
+body {
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: 700;
+    color: var(--text-color);
+    letter-spacing: -0.025em;
+}
+
+/* Utilities */
+.text-gradient {
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.bg-primary-soft {
+    background-color: rgba(229, 57, 53, 0.1);
+}
+
+/* Sidebar */
+#sidebar-wrapper {
+    min-height: 100vh;
+    margin-left: -16rem;
+    transition: margin .3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--border-color);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.02);
+    width: 16rem;
+    z-index: 1000;
+}
+
+#sidebar-wrapper .sidebar-heading {
+    padding: 1.5rem;
+    font-size: 1.25rem;
+}
+
+#sidebar-wrapper .list-group {
+    width: 16rem;
+}
+
+.list-group-item {
+    border: none;
+    padding: 0.875rem 1.5rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    background-color: transparent;
+    transition: all 0.2s;
+    margin: 0.25rem 0.75rem;
+    border-radius: 0.5rem;
+}
+
+.list-group-item:hover {
+    background-color: var(--bg-color);
+    color: var(--primary-color);
+    transform: translateX(4px);
+}
+
+.list-group-item.active {
+    background: var(--primary-gradient);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(255, 65, 108, 0.3);
+}
+
+#page-content-wrapper {
+    min-width: 100vw;
+}
+
+body.sb-sidenav-toggled #wrapper #sidebar-wrapper {
+    margin-left: 0;
+}
+
+@media (min-width: 768px) {
+    #sidebar-wrapper {
+        margin-left: 0;
+    }
+
+    #page-content-wrapper {
+        min-width: 0;
+        width: 100%;
+    }
+
+    body.sb-sidenav-toggled #wrapper #sidebar-wrapper {
+        margin-left: -16rem;
+    }
+}
+
+/* Navbar */
+.navbar {
+    background-color: var(--nav-bg) !important;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-color) !important;
+    height: 70px;
+    z-index: 900;
+}
+
+.btn-icon {
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+/* Cards & Dashboard */
+.card {
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    background: var(--card-bg);
+    box-shadow: var(--shadow-sm);
+    color: var(--text-color);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.card-header {
+    background: transparent;
+    border-bottom: 1px solid var(--border-color);
+    font-weight: 700;
+    padding: 1.25rem 1.5rem;
+    color: var(--text-color);
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Auth Pages */
+.auth-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at top right, rgba(255, 65, 108, 0.05), transparent 40%),
+        radial-gradient(circle at bottom left, rgba(255, 75, 43, 0.05), transparent 40%);
+}
+
+.auth-box {
+    width: 100%;
+    max-width: 420px;
+    padding: 2.5rem;
+    background: var(--card-bg);
+    border-radius: 20px;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-color);
+}
+
+/* Forms */
+.form-control {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    transition: all 0.2s;
+}
+
+.form-control:focus {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    box-shadow: 0 0 0 4px rgba(255, 65, 108, 0.1);
+    border-color: var(--primary-color);
+}
+
+/* Buttons */
+.btn-primary {
+    background: var(--primary-gradient);
+    border: none;
+    border-radius: 10px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    box-shadow: 0 4px 6px -1px rgba(255, 65, 108, 0.2);
+    transition: all 0.2s;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #FF4B2B 0%, #FF416C 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 10px -1px rgba(255, 65, 108, 0.3);
+}
+
+/* Dark Mode Overrides for Bootstrap elements */
+[data-theme="dark"] .table {
+    --bs-table-color: var(--text-color);
+    --bs-table-bg: transparent;
+    --bs-table-border-color: var(--border-color);
+}
+
+[data-theme="dark"] .list-group-item-light {
+    color: var(--text-color);
+    background-color: var(--sidebar-bg);
+}
+
+[data-theme="dark"] .dropdown-menu {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .dropdown-item {
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+    background-color: var(--bg-color);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+}
