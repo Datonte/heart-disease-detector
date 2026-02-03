@@ -14,3 +14,9 @@ heart_modelrg.pkl
 scaler.pkl
 pca.pkl
 model_columns.pkl
+
+# Exclude development files
+*.md
+.git/
+.gitignore
+.vercel/
