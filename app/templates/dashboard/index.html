@@ -7,15 +7,15 @@
     <div class="row">
         <!-- Stats Cards -->
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card card-soft bg-primary-soft h-100">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Patients</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_patients }}</div>
+                            <div class="h4 mb-0 font-weight-bold">{{ stats.total_patients }}</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-user-injured fa-2x text-gray-300"></i>
+                            <i class="fas fa-user-injured fa-2x text-primary-soft" style="opacity: 0.5;"></i>
                         </div>
                     </div>
                 </div>
@@ -23,16 +23,16 @@
         </div>
 
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2">
+            <div class="card card-soft bg-success-soft h-100">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Predictions Made
                             </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_predictions }}</div>
+                            <div class="h4 mb-0 font-weight-bold">{{ stats.total_predictions }}</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                            <i class="fas fa-clipboard-list fa-2x text-success-soft" style="opacity: 0.5;"></i>
                         </div>
                     </div>
                 </div>
@@ -40,15 +40,15 @@
         </div>
 
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-info shadow h-100 py-2">
+            <div class="card card-soft bg-info-soft h-100">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Staff Members</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.staff_count }}</div>
+                            <div class="h4 mb-0 font-weight-bold">{{ stats.staff_count }}</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-user-md fa-2x text-gray-300"></i>
+                            <i class="fas fa-user-md fa-2x text-info-soft" style="opacity: 0.5;"></i>
                         </div>
                     </div>
                 </div>
@@ -56,16 +56,16 @@
         </div>
 
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card card-soft bg-warning-soft h-100">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">High Risk Cases
                                 (Detected)</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.high_risk_count }}</div>
+                            <div class="h4 mb-0 font-weight-bold">{{ stats.high_risk_count }}</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-heart-broken fa-2x text-gray-300"></i>
+                            <i class="fas fa-heart-broken fa-2x text-warning-soft" style="opacity: 0.5;"></i>
                         </div>
                     </div>
                 </div>

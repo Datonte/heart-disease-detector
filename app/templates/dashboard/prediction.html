@@ -2,132 +2,183 @@
 
 {% block content %}
 <div class="container-fluid">
-    <h1 class="h3 mb-4 text-gray-800">Heart Disease Prediction</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">New Prediction</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ url_for('main.dashboard') }}">Dashboard</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Prediction</li>
+            </ol>
+        </nav>
+    </div>
 
     <div class="row">
         <div class="col-lg-8">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Input Clinical Parameters</h6>
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white py-3 border-0">
+                    <h6 class="m-0 font-weight-bold text-gradient"><i class="fas fa-file-medical-alt me-2"></i>Clinical
+                        Assessment Form</h6>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-4">
                     <form method="POST" action="{{ url_for('main.predict') }}">
-                        <div class="mb-3">
-                            <label for="patient_id" class="form-label">Select Patient</label>
-                            <select class="form-select" name="patient_id" required>
-                                {% for patient in patients %}
-                                <option value="{{ patient.id }}">{{ patient.full_name }} (ID: {{ patient.id }})</option>
-                                {% endfor %}
-                            </select>
-                        </div>
 
-                        <div class="mb-3">
-                            <label for="model_name" class="form-label">Select Prediction Model</label>
-                            <select class="form-select" name="model_name" required>
-                                {% for model in available_models %}
-                                <option value="{{ model }}">{{ model }}</option>
-                                {% endfor %}
-                                <option value="Both Models">Both Models (Logistic Regression & Random Forest)</option>
-                            </select>
-                        </div>
-
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="age" class="form-label">Age</label>
-                                <input type="number" step="1" class="form-control" name="age" required>
+                        <!-- Section 1: Patient & Model -->
+                        <h6 class="text-xs font-weight-bold text-primary text-uppercase mb-3 mt-1">1. Configuration</h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label for="patient_id"
+                                    class="form-label small text-muted text-uppercase fw-bold">Patient</label>
+                                <select class="form-select form-select-sm" name="patient_id" required>
+                                    {% for patient in patients %}
+                                    <option value="{{ patient.id }}">{{ patient.full_name }} (ID: {{ patient.id }})
+                                    </option>
+                                    {% endfor %}
+                                </select>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="sex" class="form-label">Sex (1=Male, 0=Female)</label>
-                                <select class="form-select" name="sex" required>
+                            <div class="col-md-6">
+                                <label for="model_name" class="form-label small text-muted text-uppercase fw-bold">AI
+                                    Model</label>
+                                <select class="form-select form-select-sm" name="model_name" required>
+                                    {% for model in available_models %}
+                                    <option value="{{ model }}">{{ model }}</option>
+                                    {% endfor %}
+                                    <option value="Both Models">Both Models (Ensemble)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Section 2: Vitals -->
+                        <h6 class="text-xs font-weight-bold text-primary text-uppercase mb-3">2. Vital Signs</h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <label class="form-label small text-muted">Age
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input type="number" step="1" class="form-control form-control-sm" name="age" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small text-muted">Sex
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select form-select-sm" name="sex" required>
                                     <option value="1">Male</option>
                                     <option value="0">Female</option>
                                 </select>
                             </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="thalach" class="form-label">Max Heart Rate Achieved</label>
-                                <input type="number" class="form-control" name="thalach" placeholder="150" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="exang" class="form-label">Exercise Induced Angina (1=Yes, 0=No)</label>
-                                <select class="form-select" name="exang">
-                                    <option value="0">No</option>
-                                    <option value="1">Yes</option>
-                                </select>
+                            <div class="col-md-4">
+                                <label class="form-label small text-muted">Max Heart Rate
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" class="form-control" name="thalach" placeholder="e.g. 150"
+                                        required>
+                                    <span class="input-group-text text-muted">bpm</span>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-12 mb-3">
-                                <label for="cp" class="form-label">Chest Pain Type (0-3)</label>
-                                <select class="form-select" name="cp" required>
+                        <!-- Section 3: Clinical Observations -->
+                        <h6 class="text-xs font-weight-bold text-primary text-uppercase mb-3">3. Clinical Observations
+                        </h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label small text-muted">Chest Pain Type</label>
+                                <select class="form-select form-select-sm" name="cp" required>
                                     <option value="0">Typical Angina</option>
                                     <option value="1">Atypical Angina</option>
                                     <option value="2">Non-anginal Pain</option>
                                     <option value="3">Asymptomatic</option>
                                 </select>
                             </div>
+                            <div class="col-md-6">
+                                <label class="form-label small text-muted">Exercise Induced Angina?</label>
+                                <select class="form-select form-select-sm" name="exang">
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                            </div>
                         </div>
 
-
-                        <div class="mb-3">
-                            <label for="oldpeak" class="form-label">ST Depression Induced by Exercise</label>
-                            <input type="number" step="0.1" class="form-control" name="oldpeak" placeholder="0.0"
-                                required>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label for="slope" class="form-label">Slope of Peak Exercise ST Segment (0-2)</label>
-                                <select class="form-select" name="slope">
+                        <!-- Section 4: Advanced Measurements -->
+                        <h6 class="text-xs font-weight-bold text-primary text-uppercase mb-3">4. Advanced Diagnostics
+                        </h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-3">
+                                <label class="form-label small text-muted">ST Depression</label>
+                                <input type="number" step="0.1" class="form-control form-control-sm" name="oldpeak"
+                                    placeholder="0.0" required>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small text-muted">ST Slope</label>
+                                <select class="form-select form-select-sm" name="slope">
                                     <option value="0">Upsloping</option>
                                     <option value="1">Flat</option>
                                     <option value="2">Downsloping</option>
                                 </select>
                             </div>
-                            <div class="col-md-4 mb-3">
-                                <label for="ca" class="form-label">Number of Major Vessels (0-3) Colored by
-                                    Flourosopy</label>
-                                <select class="form-select" name="ca">
+                            <div class="col-md-3">
+                                <label class="form-label small text-muted">Major Vessels (0-3)</label>
+                                <select class="form-select form-select-sm" name="ca">
                                     <option value="0">0</option>
                                     <option value="1">1</option>
                                     <option value="2">2</option>
                                     <option value="3">3</option>
                                 </select>
                             </div>
-                            <div class="col-md-4 mb-3">
-                                <label for="thal" class="form-label">Thalassemia (1=Normal, 2=Fixed Defect, 3=Reversable
-                                    Defect)</label>
-                                <select class="form-select" name="thal">
+                            <div class="col-md-3">
+                                <label class="form-label small text-muted">Thalassemia</label>
+                                <select class="form-select form-select-sm" name="thal">
                                     <option value="1">Normal</option>
-                                    <option value="2">Fixed Defect</option>
-                                    <option value="3">Reversable Defect</option>
+                                    <option value="2">Fixed</option>
+                                    <option value="3">Reversable</option>
                                 </select>
                             </div>
                         </div>
 
-                        <button type="submit" class="btn btn-primary w-100 btn-lg mt-3"><i
-                                class="fas fa-microscope"></i> Run Prediction Analysis</button>
+                        <div class="d-grid gap-2 mt-5">
+                            <button type="submit" class="btn btn-primary btn-lg shadow-sm">
+                                <i class="fas fa-heartbeat me-2"></i>Run Prediction Analysis
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
         </div>
 
+        <!-- Sidebar Info -->
         <div class="col-lg-4">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-info">Model Information</h6>
-                </div>
+            <div class="card shadow-sm border-0 mb-4 bg-primary-soft">
                 <div class="card-body">
-                    <p><strong>Logistic Regression:</strong> Best for standard linear classification.</p>
-                    <p><strong>Random Forest:</strong> Uses multiple decision trees for higher accuracy.</p>
-                    <p>Parameters Required: 9 (Specific Subset)</p>
-                    <hr>
-                    <small class="text-muted">Ensure all vitals are accurate before running the model. Results are for
-                        assistance only and should be verified by a doctor.</small>
+                    <h6 class="font-weight-bold text-primary mb-3"><i class="fas fa-info-circle me-2"></i>Model Guide
+                    </h6>
+                    <div class="small mb-3">
+                        <div class="mb-2">
+                            <strong class="text-body-emphasis">Logistic Regression:</strong> <br> Optimal for linear
+                            relationships and interpreting coefficient impact.
+                        </div>
+                        <div>
+                            <strong class="text-body-emphasis">Random Forest:</strong> <br> Ensemble method using
+                            multiple
+                            decision trees. Often provides higher accuracy for complex patterns.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h6 class="font-weight-bold text-body-emphasis mb-3">Input Tips</h6>
+                    <ul class="list-unstyled small text-muted m-0">
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i><strong
+                                class="text-body-emphasis">Age:</strong> Patient's
+                            age in years.</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i><strong
+                                class="text-body-emphasis">CP (Chest Pain):</strong>
+                            'Asymptomatic' is most common in early stages.</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i><strong
+                                class="text-body-emphasis">Thalach:</strong> Maximum
+                            heart rate achieved during stress test.</li>
+                    </ul>
                 </div>
             </div>
         </div>

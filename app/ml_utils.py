@@ -2,70 +2,39 @@
 import os
 import pickle
 import numpy as np
+import pandas as pd
 import traceback
-import urllib.request
-import tempfile
 
 class ModelHandler:
-    def __init__(self, models_config, scalar_path=None, pca_path=None, columns_path=None, 
-                 model_urls=None, artifact_urls=None):
+    def __init__(self, models_config, scalar_path=None, pca_path=None, columns_path=None):
         self.models_config = models_config
         self.models = {}
         self.scaler = None
         self.pca = None
         self.model_columns = None
-        self.model_urls = model_urls or {}
-        self.artifact_urls = artifact_urls or {}
         
         # Load Main Models
-        self.load_models(self.model_urls)
+        self.load_models()
         
         # Load Preprocessing Objects
-        self.load_artifact(scalar_path, 'scaler', self.artifact_urls.get('scaler'))
-        self.load_artifact(pca_path, 'pca', self.artifact_urls.get('pca'))
-        self.load_artifact(columns_path, 'model_columns', self.artifact_urls.get('model_columns'))
+        self.load_artifact(scalar_path, 'scaler')
+        self.load_artifact(pca_path, 'pca')
+        self.load_artifact(columns_path, 'model_columns')
 
-    def download_file(self, url, local_path):
-        """Download a file from URL if it doesn't exist locally"""
-        if os.path.exists(local_path):
-            return local_path
-        
-        try:
-            print(f"Downloading {os.path.basename(local_path)} from {url}...")
-            os.makedirs(os.path.dirname(local_path), exist_ok=True)
-            urllib.request.urlretrieve(url, local_path)
-            print(f"Downloaded {os.path.basename(local_path)} successfully")
-            return local_path
-        except Exception as e:
-            print(f"Error downloading {url}: {e}")
-            return None
-
-    def load_artifact(self, path, attr_name, download_url=None):
-        if path:
-            # Try to download if URL provided and file doesn't exist
-            if download_url and not os.path.exists(path):
-                self.download_file(download_url, path)
-            
-            if os.path.exists(path):
-                try:
-                    with open(path, 'rb') as f:
-                        setattr(self, attr_name, pickle.load(f))
-                    print(f"{attr_name} loaded from {path}")
-                except Exception as e:
-                    print(f"Error loading {attr_name}: {e}")
-            else:
-                print(f"Warning: {attr_name} file not found at {path}")
+    def load_artifact(self, path, attr_name):
+        if path and os.path.exists(path):
+            try:
+                with open(path, 'rb') as f:
+                    setattr(self, attr_name, pickle.load(f))
+                print(f"{attr_name} loaded from {path}")
+            except Exception as e:
+                print(f"Error loading {attr_name}: {e}")
         else:
-            print(f"Warning: {attr_name} path not provided")
+            print(f"Warning: {attr_name} file not found at {path}")
 
-    def load_models(self, download_urls=None):
-        download_urls = download_urls or {}
+    def load_models(self):
         for name, path in self.models_config.items():
             try:
-                # Try to download if URL provided and file doesn't exist
-                if name in download_urls and not os.path.exists(path):
-                    self.download_file(download_urls[name], path)
-                
                 if not os.path.exists(path):
                     print(f"Model file not found for {name} at: {path}")
                     self.models[name] = None
@@ -160,40 +129,18 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # Models are in the parent directory of 'app'
 PROJECT_ROOT = os.path.dirname(BASE_DIR)
 
-# Use /tmp for Vercel serverless functions (read-write filesystem)
-# Check if we're in Vercel (has /tmp directory) or local
-if os.path.exists('/tmp'):
-    MODEL_DIR = '/tmp'
-else:
-    MODEL_DIR = PROJECT_ROOT
+LR_PATH = os.path.join(PROJECT_ROOT, "heart_modelrg.pkl")
+RF_PATH = os.path.join(PROJECT_ROOT, "heart_model.pkl")
 
-LR_PATH = os.path.join(MODEL_DIR, "heart_modelrg.pkl")
-RF_PATH = os.path.join(MODEL_DIR, "heart_model.pkl")
-
-SCALER_PATH = os.path.join(MODEL_DIR, "scaler.pkl")
-PCA_PATH = os.path.join(MODEL_DIR, "pca.pkl")
-COLUMNS_PATH = os.path.join(MODEL_DIR, "model_columns.pkl")
+SCALER_PATH = os.path.join(PROJECT_ROOT, "scaler.pkl")
+PCA_PATH = os.path.join(PROJECT_ROOT, "pca.pkl")
+COLUMNS_PATH = os.path.join(PROJECT_ROOT, "model_columns.pkl")
 
 MODELS_CONFIG = {
     "Logistic Regression": LR_PATH,
     "Random Forest": RF_PATH
 }
 
-# URLs for downloading models (set via environment variables or use GitHub raw URLs)
-# Default to GitHub raw URLs from the repository
-GITHUB_REPO = os.environ.get('GITHUB_REPO', 'https://raw.githubusercontent.com/Datonte/heart-disease-detector/master')
-MODEL_URLS = {
-    "Logistic Regression": os.environ.get('LR_MODEL_URL', f'{GITHUB_REPO}/heart_modelrg.pkl'),
-    "Random Forest": os.environ.get('RF_MODEL_URL', f'{GITHUB_REPO}/heart_model.pkl')
-}
-
-ARTIFACT_URLS = {
-    'scaler': os.environ.get('SCALER_URL', f'{GITHUB_REPO}/scaler.pkl'),
-    'pca': os.environ.get('PCA_URL', f'{GITHUB_REPO}/pca.pkl'),
-    'model_columns': os.environ.get('COLUMNS_URL', f'{GITHUB_REPO}/model_columns.pkl')
-}
-
-model_handler = ModelHandler(MODELS_CONFIG, SCALER_PATH, PCA_PATH, COLUMNS_PATH, 
-                             MODEL_URLS, ARTIFACT_URLS)
+model_handler = ModelHandler(MODELS_CONFIG, SCALER_PATH, PCA_PATH, COLUMNS_PATH)
 
 
