@@ -361,6 +361,22 @@ body.sb-sidenav-toggled #sidebar-wrapper {
     border-color: var(--border-color);
 }
 
+/* Dark Mode Modals */
+[data-theme="dark"] .modal-content {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .modal-header,
+[data-theme="dark"] .modal-footer {
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
 /* Animations */
 @keyframes fadeIn {
     from {
